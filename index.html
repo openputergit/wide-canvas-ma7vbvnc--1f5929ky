@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Summary Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="card bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600">Today's Total</p>
+                        <h2 class="text-2xl font-bold">₹ 2,399,826</h2>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="bi bi-currency-rupee text-blue-500 text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Transactions: 30</p>
+            </div>
+
+            <div class="card bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600">Yesterday's Total</p>
+                        <h2 class="text-2xl font-bold">₹ 9,599,993</h2>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="bi bi-graph-up text-green-500 text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Transactions: 137</p>
+            </div>
+
+            <div class="card bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600">This Week</p>
+                        <h2 class="text-2xl font-bold">₹ 29,334,013</h2>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <i class="bi bi-calendar-week text-purple-500 text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Transactions: 567</p>
+            </div>
+
+            <div class="card bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600">This Month</p>
+                        <h2 class="text-2xl font-bold">₹ 20,334,013</h2>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <i class="bi bi-calendar-month text-yellow-500 text-xl"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Transactions: 457</p>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Transaction Trends</h3>
+                <canvas id="transactionChart"></canvas>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Card Distribution</h3>
+                <canvas id="cardDistributionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold mb-4">Recent Transactions</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Card</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="transactionTable">
+                        <!-- Transactions will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Charts
+        const transactionCtx = document.getElementById('transactionChart').getContext('2d');
+        const cardDistributionCtx = document.getElementById('cardDistributionChart').getContext('2d');
+
+        // Transaction Trends Chart
+        new Chart(transactionCtx, {
+            type: 'line',
+            data: {
+                labels: ['Last Month', 'This Month', 'Last Week', 'This Week', 'Yesterday', 'Today'],
+                datasets: [{
+                    label: 'Transaction Amount',
+                    data: [9000000, 20334013, 0, 29334013, 9599993, 2399826],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+
+        // Card Distribution Chart
+        new Chart(cardDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Card 8705', 'Card 8747', 'Card 8770', 'Card 8812', 'Card 8838', 'Card 8986', 'Card 9067', 'Card 9158', 'Card 9331', 'Card 9398'],
+                datasets: [{
+                    data: [2000000, 3995174, 3992635, 3995657, 3997152, 2930047, 2450244, 2969084, 1999010, 1005010],
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+
+        // Populate Recent Transactions
+        const transactions = JSON.parse(`{"details":{"today":[{"id":"538","amount":"93242.00","card_last4":"9158","date":"2025-05-03","reference":"548906278567"}]}}`).details.today;
+        const transactionTable = document.getElementById('transactionTable');
+
+        transactions.forEach(tx => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${tx.date}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">**** ${tx.card_last4}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹ ${tx.amount}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${tx.reference}</td>
+            `;
+            transactionTable.appendChild(row);
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
